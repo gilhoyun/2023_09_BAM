@@ -1,34 +1,23 @@
 package com.KoreaIT.java.BAM;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import com.KoreaIT.java.BAM.controller.ArticleController;
 import com.KoreaIT.java.BAM.controller.Controller;
 import com.KoreaIT.java.BAM.controller.MemberController;
-import com.KoreaIT.java.BAM.dto.Article;
-import com.KoreaIT.java.BAM.dto.Member;
 
 public class App {
-
-	List<Article> articles;
-	List<Member> members;
-
-	App() {
-		articles = new ArrayList<Article>();
-		members = new ArrayList<Member>();
-	}
 
 	public void start() {
 		System.out.println("== 프로그램 시작 ==");
 
 		Scanner sc = new Scanner(System.in);
 
-		MemberController memberController = new MemberController(members, sc);
-		ArticleController articleController = new ArticleController(articles, sc);
+		MemberController memberController = new MemberController(sc);
+		ArticleController articleController = new ArticleController(sc);
 
 		articleController.makeTestData();
+		memberController.makeTestData();
 
 		Controller controller;
 
@@ -46,17 +35,15 @@ public class App {
 				break;
 			}
 
-			String[] commandDiv = command.split(" "); // article list // member join // article list 제
-			// article write // adfg
+			String[] commandDiv = command.split(" ");
 
 			String controllerName = commandDiv[0];
 			if (commandDiv.length == 1) {
 				System.out.println("명령어 확인해");
 				continue;
 			}
-			
-			String actionMethodName = commandDiv[1];
 
+			String actionMethodName = commandDiv[1];
 
 			controller = null;
 
@@ -67,6 +54,29 @@ public class App {
 			} else {
 				System.out.println("존재하지 않는 기능이야");
 				continue;
+			}
+
+			switch (controllerName + " " + actionMethodName) {
+			case "article write":
+			case "article modify":
+			case "article delete":
+			case "member logout":
+			case "member whoami":
+				if (Controller.isLogined() == false) {
+					System.out.println("현재 로그아웃 상태야. 로그인 후 이용해");
+					continue;
+				}
+				break;
+			}
+
+			switch (controllerName + " " + actionMethodName) {
+			case "member login":
+			case "member join":
+				if (Controller.isLogined()) {
+					System.out.println("이미 누가 로그인 했다. 로그아웃 후 이용해");
+					continue;
+				}
+				break;
 			}
 
 			controller.doAction(actionMethodName, command);
